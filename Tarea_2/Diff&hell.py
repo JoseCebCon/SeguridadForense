@@ -1,34 +1,50 @@
-from cryptography.fernet import Fernet
-from Crypto.Util import number
 import random
 import hashlib
 
 print("Algoritmo de Diffie-Hellman: ", '\n')
 
-g = 2
+def public_key(g, clave_privada, p):
+    return pow(g, clave_privada, p)
+
+def Secret_key(llave_publica_externa, clave_privada, p):
+    return pow(llave_publica_externa, clave_privada, p)
+
+def hash_calculate(valor):
+    return hashlib.sha256(str(valor).encode()).hexdigest()
+
+#Usar el número primo estándar del algoritmo Diffie-Hellman.
 p = 4294967295
-ali = random.getrandbits(256)
-bob = random.getrandbits(256)
+g = 2
 
-a = print("Numero Aleatorio de Alice Silverstone: ", ali, '\n')
-b = print("Numero Aleatorio de Bob Patiño: ", bob, '\n')
+#Tamaño estándar de las claves privadas
+priv_Alice = random.getrandbits(256)
+priv_Bob = random.getrandbits(256)
 
-def potencia(x,y,z):
-    print("El numero intercambiado de Alice es: ", "\n", pow(x,y,z))
+#Intercambio de Alice y Bob
+pub_alice = public_key(g, priv_Alice, p)
+pub_bob = public_key(g, priv_Bob, p)
 
-A = potencia(g,ali,p)
+#Obtener llave secreta y que sean iguales
+sec_alice = Secret_key(pub_bob, priv_Alice, p)
+sec_bob = Secret_key(pub_alice, priv_Bob, p)
 
-def potencia(x,y,z):
-    print("El numero intercambiado de Bob es: ", "\n", pow(x,y,z))
+# Verificar si las llaves secretas son iguales
+hash_alice = hash_calculate(sec_alice)
+hash_bob = hash_calculate(sec_bob)
 
-B = potencia(g,bob,p)
+print("\nLa clave privada de Alice es:", priv_Alice)
+print("La llave pública de Alice es:", pub_alice)
 
-def potencia(x,y,z):
-    print("La llave secreta de Alice es: ", "\n", pow(x,y,z))
+print("\La Clave privada de Bob es:", priv_Bob)
+print("La llave pública de Bob es:", pub_bob)
 
-s1 = potencia(B,a,p)
+print("\nLa llave secreta de Alice es:", sec_alice)
+print("El hash de la llave secreta de Alice es:", hash_alice)
 
-def potencia(x,y,z):
-    print("La llave secreta de Alice es: ", "\n", pow(x,y,z))
+print("\nLa llave secreta de Bob es:", sec_bob)
+print("El hash de la llave secreta de Bob es:", hash_bob)
 
-s2 = potencia(A,b,p)
+if hash_alice == hash_bob:
+    print("\nLas llaves secretas son iguales. Comunicación segura.")
+else:
+    print("\nLas llaves secretas son diferentes. Error en la comunicación.")
